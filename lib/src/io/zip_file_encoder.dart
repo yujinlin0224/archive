@@ -15,18 +15,19 @@ class ZipFileEncoder {
   static const int STORE = 0;
   static const int GZIP = 1;
 
-  void zipDirectory(Directory dir,
+  Future<void> zipDirectory(Directory dir,
       {String? filename,
       int? level,
       bool followLinks = true,
-      DateTime? modified}) {
+      DateTime? modified,
+      String? comment}) async {
     final dirPath = dir.path;
     final zipPath = filename ?? '$dirPath.zip';
     level ??= GZIP;
     create(zipPath, level: level, modified: modified);
-    addDirectory(dir,
+    await addDirectory(dir,
         includeDirName: false, level: level, followLinks: followLinks);
-    close();
+    await close(comment: comment);
   }
 
   void open(String zipPath) => create(zipPath);
@@ -85,8 +86,8 @@ class ZipFileEncoder {
     _encoder.addFile(file);
   }
 
-  void close() {
-    _encoder.endEncode();
-    _output.close();
+  Future<void> close({String? comment}) async {
+    _encoder.endEncode(comment: comment);
+    await _output.close();
   }
 }
