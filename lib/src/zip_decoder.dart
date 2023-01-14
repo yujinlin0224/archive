@@ -23,6 +23,7 @@ class ZipDecoder {
   }) {
     directory = ZipDirectory.read(input, password: password);
     final archive = Archive();
+    archive.comment = directory.zipFileComment;
 
     for (final zfh in directory.fileHeaders) {
       final zf = zfh.file!;
@@ -68,6 +69,7 @@ class ZipDecoder {
       file.crc32 = zf.crc32;
       file.compress = compress;
       file.lastModTime = zf.lastModFileDate << 16 | zf.lastModFileTime;
+      file.comment = zfh.fileComment;
 
       archive.addFile(file);
     }
